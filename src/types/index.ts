@@ -15,6 +15,10 @@ export interface Song {
   emoji: string;
   color: string; // gradient accent color
   lyrics: LyricLine[];
+  /** 30-second Apple Music preview stream URL (present for catalog results). */
+  previewUrl?: string;
+  /** Album artwork URL (300×300, present for catalog results). */
+  artworkUrl?: string;
 }
 
 // ── Users & Friends ───────────────────────────────────────────────────────────

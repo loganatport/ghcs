@@ -33,17 +33,19 @@ export function RecordingScreen({ navigation, route }: Props) {
 
   const { allGranted, requesting, requestAll } = usePermissions();
   const { isRecording, startRecording, stopRecording } = useRecording(cameraRef);
-  const { positionMs, isPlaying, playTicker, stop: stopAudio } = useAudioPlayer();
+  const { positionMs, isPlaying, playUrl, playTicker, stop: stopAudio } = useAudioPlayer();
   const activeIndex = useLyricSync(song.lyrics, positionMs);
 
   // Start recording after countdown completes
   const handleCountdownComplete = useCallback(async () => {
     setPhase('recording');
-    // Start audio ticker and recording simultaneously
-    playTicker(song.durationMs, () => {
-      // Auto-stop when song ends
-      handleStop();
-    });
+    // Play real preview audio if available, otherwise drive lyrics with a ticker
+    const onAudioEnd = () => handleStop();
+    if (song.previewUrl) {
+      playUrl(song.previewUrl, song.durationMs, onAudioEnd);
+    } else {
+      playTicker(song.durationMs, onAudioEnd);
+    }
     const uri = await startRecording();
     if (uri) {
       // Recording completed (stopped manually or hit maxDuration)
@@ -53,7 +55,7 @@ export function RecordingScreen({ navigation, route }: Props) {
       setPhase('idle');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [song, startRecording, stopAudio, navigation, playTicker]);
+  }, [song, startRecording, stopAudio, navigation, playUrl, playTicker]);
 
   const handleToggle = useCallback(() => {
     if (phase === 'idle') {

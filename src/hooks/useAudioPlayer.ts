@@ -29,10 +29,38 @@ export function useAudioPlayer() {
   }, [cleanup]);
 
   /**
-   * Play a tone-based "metronome" karaoke click track since we don't have
-   * actual MP3 assets bundled. In a real app, pass audioAsset to Audio.Sound.createAsync().
-   *
-   * We use a simple interval ticker to drive positionMs so lyrics still sync.
+   * Play an actual audio URL via expo-av (Apple Music 30s preview).
+   * positionMs is updated from the native playback status callback.
+   */
+  const playUrl = useCallback(
+    async (url: string, durationMs: number, onFinish?: () => void) => {
+      await cleanup();
+
+      await Audio.setAudioModeAsync({ playsInSilentModeIOS: true });
+
+      const { sound } = await Audio.Sound.createAsync(
+        { uri: url },
+        { shouldPlay: true, progressUpdateIntervalMillis: 100 },
+      );
+      soundRef.current = sound;
+      setDuration(durationMs);
+      setIsPlaying(true);
+
+      sound.setOnPlaybackStatusUpdate((status) => {
+        if (!status.isLoaded) return;
+        setPositionMs(status.positionMillis);
+        if (status.didJustFinish) {
+          setIsPlaying(false);
+          onFinish?.();
+        }
+      });
+    },
+    [cleanup],
+  );
+
+  /**
+   * Ticker-based fallback used when there is no preview URL (static songs).
+   * Drives positionMs via setInterval so lyrics still sync.
    */
   const playTicker = useCallback(
     (durationMs: number, onFinish?: () => void) => {
@@ -52,7 +80,7 @@ export function useAudioPlayer() {
         }
       }, 100);
     },
-    []
+    [],
   );
 
   const stop = useCallback(async () => {
@@ -71,5 +99,5 @@ export function useAudioPlayer() {
     setIsPlaying(false);
   }, []);
 
-  return { positionMs, isPlaying, duration, playTicker, stop, reset, cleanup };
+  return { positionMs, isPlaying, duration, playUrl, playTicker, stop, reset, cleanup };
 }

@@ -1,26 +1,49 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet } from 'react-native';
 import { Song } from '../types';
 
 interface SongCardProps {
   song: Song;
   onPress: () => void;
+  loading?: boolean;
 }
 
-export function SongCard({ song, onPress }: SongCardProps) {
+export function SongCard({ song, onPress, loading = false }: SongCardProps) {
+  const durationSec = Math.round(song.durationMs / 1000);
+
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.75}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onPress}
+      activeOpacity={0.75}
+      disabled={loading}
+    >
+      {/* Artwork / emoji tile */}
       <View style={[styles.iconBox, { backgroundColor: song.color + '33' }]}>
-        <Text style={styles.emoji}>{song.emoji}</Text>
+        {song.artworkUrl ? (
+          <Image source={{ uri: song.artworkUrl }} style={styles.artwork} />
+        ) : (
+          <Text style={styles.emoji}>{song.emoji}</Text>
+        )}
       </View>
+
+      {/* Metadata */}
       <View style={styles.info}>
         <Text style={styles.title} numberOfLines={1}>{song.title}</Text>
         <Text style={styles.artist} numberOfLines={1}>{song.artist}</Text>
         <Text style={styles.genre}>{song.genre}</Text>
       </View>
-      <View style={[styles.durationBadge, { borderColor: song.color }]}>
-        <Text style={[styles.durationText, { color: song.color }]}>60s</Text>
-      </View>
+
+      {/* Right side: loading spinner or duration badge */}
+      {loading ? (
+        <ActivityIndicator color={song.color} size="small" />
+      ) : (
+        <View style={[styles.durationBadge, { borderColor: song.color }]}>
+          <Text style={[styles.durationText, { color: song.color }]}>
+            {durationSec}s
+          </Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 }
@@ -42,6 +65,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
+  },
+  artwork: {
+    width: 54,
+    height: 54,
+    borderRadius: 12,
   },
   emoji: {
     fontSize: 28,
