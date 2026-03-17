@@ -1,0 +1,60 @@
+{
+  "expo": {
+    "name": "KaraokeSnap",
+    "slug": "karaoke-snap",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0d0d0d"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.karaokeSnap.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "KaraokeSnap needs camera access to record your karaoke videos.",
+        "NSMicrophoneUsageDescription": "KaraokeSnap needs microphone access to capture your voice while singing.",
+        "NSPhotoLibraryUsageDescription": "KaraokeSnap saves your karaoke videos to your photo library.",
+        "NSPhotoLibraryAddUsageDescription": "KaraokeSnap saves your karaoke videos to your photo library."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0d0d0d"
+      },
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "package": "com.karaokeSnap.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "KaraokeSnap needs camera access to record your karaoke videos.",
+          "microphonePermission": "KaraokeSnap needs microphone access to capture your voice while singing."
+        }
+      ],
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "KaraokeSnap saves your karaoke videos to your photo library.",
+          "savePhotosPermission": "KaraokeSnap saves your karaoke videos to your photo library."
+        }
+      ]
+    ]
+  }
+}
